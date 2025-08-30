@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Strava Data Sync & Analysis Package
 
 This package provides a robust and flexible solution for synchronizing your Strava
@@ -194,7 +193,3 @@ if __name__ == "__main__":
     # custom_pipeline.sync_all_data()
 
     logging.info("Strava Data Sync Pipeline completed.")
-=======
-# StravaPuller
-Strava Data Fetcher
->>>>>>> 97723b8e6353a299a53061be512ccb2577329432
