@@ -1,0 +1,144 @@
+[build-system]
+requires = ["hatchling>=1.5.0"] # Minimum Hatchling version
+build-backend = "hatchling.build"
+
+[project]
+name = "strava-fetcher" # The name of your package on PyPI
+version = "1.0.0"
+description = "A robust pipeline for syncing Strava activity data and streams locally."
+readme = "README.md"
+requires-python = ">=3.8" # Minimum Python version
+license = { file = "LICENSE" } # Assuming you'll add a LICENSE.txt file
+keywords = ["strava", "api", "data sync", "activities", "streams", "pipeline"]
+authors = [
+    { name = "Israel Barragan", email = "abraham0vidal@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta", # 3 - Alpha, 4 - Beta, 5 - Production/Stable
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License", # Assuming MIT, change if different
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "requests>=2.31.0",      # For making HTTP requests to Strava API
+    "pandas>=2.0.0",         # For data manipulation (DataFrames)
+    "PyYAML>=6.0.1",         # For reading YAML credentials file
+    "pydantic~=2.11.7",      # For settings management
+    "pydantic-settings~=2.10.1",
+    "click>=8.0.0",          # For creating the command-line interface
+]
+
+[project.urls]
+Homepage = "https://github.com/hope0hermes/StravaFetcher"
+Issues = "https://github.com/hope0hermes/StravaFetcher/issues"
+Source = "https://github.com/hope0hermes/StravaFetcher"
+
+[project.scripts]
+# Creates the `strava-fetcher` command that runs the main() function.
+strava-fetcher = "strava_fetcher.cli:main"
+
+[project.optional-dependencies]
+# Define groups of optional dependencies (e.g., for development, testing)
+dev = [
+    "pytest>=7.0.0", # For running tests
+    "mypy>=1.0.0", # For static type checking
+    "ruff>=0.1.0", # All-in-one linter and formatter
+]
+
+[tool.hatch.metadata]
+# Configuration for how Hatch handles project metadata.
+
+[tool.hatch.build]
+# Configuration for how Hatch builds your package
+# Point to the directory containing your package's code.
+packages = ["src/strava_fetcher"]
+
+[tool.hatch.envs.default]
+# Default environment for development
+dependencies = [
+    "pytest",
+    "mypy",
+    "ruff",
+]
+
+[tool.hatch.envs.test]
+# Environment for running tests
+dependencies = [
+    "pytest",
+    "ruff", # It's good practice to include the linter here too
+]
+[tool.hatch.envs.test.scripts]
+default = ["pytest {args}"]
+
+[tool.hatch.envs.lint]
+# Environment for linting and type checking
+dependencies = [
+    "ruff",
+    "mypy",
+]
+[tool.hatch.envs.lint.scripts]
+default = [
+    "ruff check . {args}",
+    "ruff format --check . {args}",
+    "python -m mypy src/strava_fetcher {args}",
+]
+check = "ruff check . {args}"
+format-check = "ruff format --check . {args}"
+mypy = "python -m mypy src/strava_fetcher {args}"
+[tool.hatch.envs.fmt]
+# Environment for formatting (usually not run in CI/CD, but for local development)
+dependencies = [
+    "ruff",
+]
+[tool.hatch.envs.fmt.scripts]
+format = "ruff format . --verbose {args}"
+check = "ruff check . --fix --verbose {args}"
+
+[tool.hatch.build.targets.sdist]
+# Configuration for source distribution
+include = [
+    "/src/strava_fetcher",
+    "/README.md",
+    "/LICENSE",
+]
+
+[tool.ruff]
+# Assume Python 3.10+
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+# For a full list of rules, see: https://docs.astral.sh/ruff/rules/
+# "I" is for isort, "UP" for pyupgrade, "B" for flake8-bugbear, "C4" for flake8-comprehensions
+select = ["E", "F", "W", "I", "UP", "B", "C4"]
+ignore = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Use black-compatible formatting.
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+# Ignore missing imports for pandas
+[[tool.mypy.overrides]]
+module = ["pandas.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["requests.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["yaml.*"]
+ignore_missing_imports = true

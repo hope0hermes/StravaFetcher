@@ -1,0 +1,28 @@
+# Ignore common Python build and virtual environment directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+.python-version
+
+# Ignore common dependency management files and directories
+Pipfile.lock
+poetry.lock
+requirements.txt
+node_modules/
+build/
+dist/
+
+# Ignore project-specific metadata and temporary files
+.vscode/
+.idea/
+.DS_Store
+.git/
+
+# Ignore logs and temporary files
+*.log
+tmp/
+temp/
