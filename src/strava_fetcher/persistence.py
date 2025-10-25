@@ -22,16 +22,17 @@ class TokenPersistence:
 
     def read(self) -> Token | None:
         """
-        Reads the token from the file system.
+        Read the token from the file system.
 
         Returns:
             A Token object if the file exists and is valid, otherwise None.
+
         """
         if self.token_path is None or not self.token_path.is_file():
             logging.info("Token file not found at %s.", self.token_path)
             return None
         try:
-            with open(self.token_path) as f:
+            with open(self.token_path, encoding="utf-8") as f:
                 token_data = json.load(f)
             return Token(**token_data)
         except (json.JSONDecodeError, TypeError) as e:
@@ -41,9 +42,7 @@ class TokenPersistence:
             return None
 
     def write(self, token: Token) -> None:
-        """
-        Writes the token to the file system, ensuring secret values are preserved.
-        """
+        """Write token to the file system, ensuring secret values are preserved."""
         if self.token_path is None:
             return
         try:
@@ -56,7 +55,7 @@ class TokenPersistence:
                 "expires_at": token.expires_at,
             }
 
-            with open(self.token_path, "w") as f:
+            with open(self.token_path, "w", encoding="utf-8") as f:
                 json.dump(token_dict_to_save, f, indent=4)
 
             logging.info("Token successfully written to %s", self.token_path)
@@ -73,20 +72,20 @@ class ActivityPersistence:
         self.streams_dir = streams_dir
 
     def read_cache(self) -> pd.DataFrame | None:
-        """Reads the activity summary cache file."""
+        """Read the activity summary cache file."""
         if self.cache_file is None or not self.cache_file.is_file():
             return None
         return pd.read_csv(self.cache_file, sep=";")
 
     def write_cache(self, activities_df: pd.DataFrame) -> None:
-        """Writes the activity summary cache file."""
+        """Write the activity summary cache file."""
         if self.cache_file is None:
             return
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)
         activities_df.to_csv(self.cache_file, sep=";", index=False)
 
     def get_existing_stream_ids(self) -> set[int]:
-        """Returns a set of activity IDs for which stream files already exist."""
+        """Return a set of activity IDs for which stream files already exist."""
         if self.streams_dir is None or not self.streams_dir.is_dir():
             return set()
         return {
@@ -96,7 +95,7 @@ class ActivityPersistence:
         }
 
     def write_stream(self, activity_id: int, stream_df: pd.DataFrame) -> None:
-        """Writes a single activity stream to a CSV file."""
+        """Write a single activity stream to a CSV file."""
         if self.streams_dir is None:
             return
         self.streams_dir.mkdir(parents=True, exist_ok=True)

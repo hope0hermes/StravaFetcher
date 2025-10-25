@@ -36,7 +36,8 @@ class StravaSyncPipeline:
 
     def _get_valid_token(self) -> Token:
         """
-        Ensures a valid Strava token is available, refreshing it if necessary.
+        Ensure a valid Strava token is available, refreshing it if necessary.
+
         If no token exists, it guides the user through the authorization process.
         """
         token = self.token_persistence.read()
@@ -75,7 +76,7 @@ class StravaSyncPipeline:
         return new_token
 
     def _sync_activities(self, token: Token) -> None:
-        """Synchronizes all activity summaries."""
+        """Synchronize all activity summaries."""
         logging.info("Starting activity summary synchronization.")
 
         existing_activities_df = self.activity_persistence.read_cache()
@@ -108,7 +109,7 @@ class StravaSyncPipeline:
         )
 
     def _sync_streams(self, token: Token) -> None:
-        """Synchronizes all missing activity streams."""
+        """Synchronize all missing activity streams."""
         logging.info("Starting activity stream synchronization.")
 
         activities_df = self.activity_persistence.read_cache()
@@ -156,7 +157,7 @@ class StravaSyncPipeline:
                 )
 
     def run(self) -> None:
-        """Executes the full data synchronization pipeline."""
+        """Execute the full data synchronization pipeline."""
         logging.info("--- Starting Strava Data Synchronization ---")
 
         try:

@@ -38,9 +38,7 @@ class StravaClient:
         return self.api_settings.client_secret.get_secret_value()
 
     def _handle_response(self, response: requests.Response) -> Any:
-        """
-        Handles the response from the Strava API, raising exceptions for errors.
-        """
+        """Handle the response from the Strava API, raising exceptions for errors."""
         if response.status_code == 401:
             raise UnauthorizedError()
         if response.status_code == 429:
@@ -50,7 +48,7 @@ class StravaClient:
         return response.json()
 
     def get_authorization_url(self) -> str:
-        """Constructs the Strava authorization URL for the user."""
+        """Construct the Strava authorization URL for the user."""
         redirect_uri = "http://localhost"
         scope = "profile:read_all,activity:read_all"
         return (
@@ -61,9 +59,7 @@ class StravaClient:
         )
 
     def exchange_auth_code_for_token(self, auth_code: str) -> Token:
-        """
-        Exchanges an authorization code for a full token.
-        """
+        """Exchange an authorization code for a full token."""
         response = self.session.post(
             f"{STRAVA_OAUTH_URL}/token",
             data={
@@ -77,9 +73,7 @@ class StravaClient:
         return Token(**token_data)
 
     def refresh_token(self, refresh_token: SecretStr) -> Token:
-        """
-        Refreshes an expired access token.
-        """
+        """Refresh an expired access token."""
         logging.info("Refreshing Strava access token.")
         response = self.session.post(
             f"{STRAVA_OAUTH_URL}/token",
@@ -96,7 +90,7 @@ class StravaClient:
     def get_activities(
         self, access_token: SecretStr, page: int, per_page: int
     ) -> list[dict[str, Any]]:
-        """Fetches a single page of activities."""
+        """Fetch a single page of activities."""
         response = self.session.get(
             f"{STRAVA_API_BASE_URL}/athlete/activities",
             headers={"Authorization": f"Bearer {access_token.get_secret_value()}"},
@@ -107,7 +101,7 @@ class StravaClient:
     def get_activity_streams(
         self, access_token: SecretStr, activity_id: int
     ) -> dict[str, Any]:
-        """Fetches the streams for a single activity."""
+        """Fetch the streams for a single activity."""
         stream_keys = [
             "time",
             "distance",

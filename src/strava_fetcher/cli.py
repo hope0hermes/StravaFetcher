@@ -24,10 +24,7 @@ logging.basicConfig(
 
 @click.group()
 def main():
-    """
-    A CLI tool for fetching and synchronizing data from the Strava API.
-    """
-    pass
+    """Fetch and synchronize data from the Strava API."""
 
 
 @main.command()

@@ -28,6 +28,7 @@ from .exceptions import ConfigError
 
 
 def to_str(v: Any) -> str | None:
+    """Convert input to string, handling None values."""
     if v is None:
         return None
     return str(v)
@@ -96,7 +97,7 @@ class Settings(BaseModel):
         """Load settings from a YAML file."""
         if not file_path.is_file():
             raise FileNotFoundError(f"Configuration file not found: {file_path}")
-        with open(file_path) as f:
+        with open(file_path, encoding="utf-8") as f:
             config_data = yaml.safe_load(f) or {}
 
         try:
@@ -112,6 +113,7 @@ class Settings(BaseModel):
 
     def ensure_paths_exist(self) -> None:
         """Create all necessary data directories if they don't exist."""
+        # pylint: disable=no-member  # Pydantic creates these attributes dynamically
         self.paths.data_dir.mkdir(parents=True, exist_ok=True)
         if self.paths.streams_dir is not None:
             self.paths.streams_dir.mkdir(parents=True, exist_ok=True)
@@ -127,9 +129,7 @@ def load_settings(
     client_id: str | None = None,
     client_secret: str | None = None,
 ) -> Settings:
-    """
-    Load settings from a YAML file, environment variables, or direct arguments.
-    """
+    """Load settings from a YAML file, environment variables, or direct arguments."""
     if config_file is not None:
         logging.info(f"Loading settings from {config_file}")
         settings = Settings.from_yaml(Path(config_file))
@@ -138,6 +138,7 @@ def load_settings(
         settings = Settings()
 
     # Load from environment variables if not already set
+    # pylint: disable=no-member  # Pydantic creates these attributes dynamically
     if settings.strava_api.client_id is None:
         client_id_env = os.getenv("STRAVA_CLIENT_ID")
         if client_id_env:
