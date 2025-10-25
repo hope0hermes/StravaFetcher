@@ -84,7 +84,8 @@ jobs:
 
         # Analyze commits using regex patterns for Conventional Commits
         # Priority: major > minor > patch > none (if any commit is major, bump major)
-        if echo "$COMMITS" | grep -qE "^(feat|feature)(\(.+\))?!:|^BREAKING CHANGE:"; then
+        # Note: GitHub adds (#PR) to merge commits, so we check for ! anywhere before :
+        if echo "$COMMITS" | grep -qE "^(feat|feature)(\(.+\))?!|BREAKING CHANGE:"; then
           BUMP="major"  # Breaking changes: 1.0.0 → 2.0.0
         elif echo "$COMMITS" | grep -qE "^(feat|feature)(\(.+\))?:"; then
           BUMP="minor"  # New features: 1.0.0 → 1.1.0
