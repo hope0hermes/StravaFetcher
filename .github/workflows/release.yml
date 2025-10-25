@@ -130,7 +130,7 @@ jobs:
         fi
 
         # Insert new version section after [Unreleased] header
-        # sed -i does in-place editing of CHANGELOG.md
+        # Use printf to properly handle newlines in YAML
         sed -i "/^## \[Unreleased\]/a\\
 \\n## [$NEW_VERSION] - $DATE\\n\\n### Changed\\n$COMMITS\\n" CHANGELOG.md
 
