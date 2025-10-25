@@ -54,6 +54,19 @@ jobs:
         # Extract release notes from CHANGELOG.md for this version
         RELEASE_NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/p" CHANGELOG.md | sed '$d' | tail -n +2)
 
+        # Check if release already exists
+        if gh release view "v$VERSION" >/dev/null 2>&1; then
+          echo "Release v$VERSION already exists, skipping"
+          exit 0
+        fi
+
+        # Create tag if it doesn't exist
+        if ! git tag | grep -q "^v$VERSION$"; then
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+          echo "Created and pushed tag v$VERSION"
+        fi
+
         # Create release
         gh release create "v$VERSION" \
           --title "Release v$VERSION" \
