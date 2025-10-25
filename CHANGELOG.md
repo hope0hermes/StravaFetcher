@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.5] - 2025-10-25
+
+### Changed
+- fix: test automated release workflow (#33) (d6fdd81)
+- fix: remove [skip ci] from version bump commits (#32) (b8c4bef)
+
+
 ## [1.0.4] - 2025-10-25
 
 ### Changed
