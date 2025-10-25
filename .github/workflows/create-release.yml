@@ -35,9 +35,10 @@ jobs:
         COMMIT_MSG=$(git log -1 --pretty=format:"%s")
         echo "Commit message: $COMMIT_MSG"
 
-        if echo "$COMMIT_MSG" | grep -qE "^chore: bump version to"; then
+        if echo "$COMMIT_MSG" | grep -qiE "^chore: bump version to"; then
           echo "is_version_bump=true" >> $GITHUB_OUTPUT
-          VERSION=$(echo "$COMMIT_MSG" | sed -n 's/^chore: bump version to \([0-9.]*\).*/\1/p')
+          # Extract version number (handles optional PR number like (#22))
+          VERSION=$(echo "$COMMIT_MSG" | sed -n 's/^[Cc]hore: bump version to \([0-9.]*\).*/\1/p')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "This is a version bump to $VERSION"
         else
