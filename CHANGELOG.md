@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2025-10-25
+
+### Changed
+- fix: add comprehensive logging to release workflow (#29) (6ee8046)
+
+
 ## [1.0.3] - 2025-10-25
 
 ### Changed
