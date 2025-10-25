@@ -191,5 +191,10 @@ jobs:
           --body "$PR_BODY" \
           --base main \
           --head "$BRANCH_NAME"
+        
+        # Trigger checks on the PR by creating an empty commit
+        # This ensures checks run and appear as required status checks
+        git commit --allow-empty -m "chore: trigger CI checks"
+        git push origin "$BRANCH_NAME"
       env:
         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
