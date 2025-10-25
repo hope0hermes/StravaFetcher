@@ -56,22 +56,36 @@ jobs:
       if: steps.check_version_bump.outputs.is_version_bump == 'true'
       run: |
         VERSION="${{ steps.check_version_bump.outputs.version }}"
+        
+        echo "Creating release for version: $VERSION"
 
         # Extract release notes from CHANGELOG.md for this version
         RELEASE_NOTES=$(sed -n "/^## \[$VERSION\]/,/^## \[/p" CHANGELOG.md | sed '$d' | tail -n +2)
-
+        
+        echo "Release notes:"
+        echo "$RELEASE_NOTES"
+        
         # Check if release already exists
-        if gh release view "v$VERSION" >/dev/null 2>&1; then
-          echo "Release v$VERSION already exists, skipping"
+        if gh release view "v$VERSION" 2>/dev/null; then
+          echo "❌ Release v$VERSION already exists, skipping"
           exit 0
         fi
+        
+        echo "Release does not exist, creating..."
 
         # Create release (this will also create the tag if it doesn't exist)
-        gh release create "v$VERSION" \
+        if gh release create "v$VERSION" \
           --target main \
           --title "Release v$VERSION" \
-          --notes "$RELEASE_NOTES"
-
-        echo "Created release v$VERSION with tag"
+          --notes "$RELEASE_NOTES"; then
+          echo "✅ Successfully created release v$VERSION with tag"
+        else
+          echo "❌ Failed to create release v$VERSION"
+          exit 1
+        fi
+        
+        # Verify the release was created
+        echo "Verifying release..."
+        gh release view "v$VERSION"
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
