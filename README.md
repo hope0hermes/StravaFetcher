@@ -2,7 +2,7 @@
 
 A robust and flexible solution for synchronizing your Strava activity data and streams to local storage. Designed for developers and data enthusiasts, it handles the complexities of Strava's OAuth2 authentication, API rate limits, and data persistence, allowing you to focus on analyzing your athletic performance.
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Why StravaFetcher?
