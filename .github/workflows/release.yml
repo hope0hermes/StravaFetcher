@@ -3,6 +3,11 @@
 # This workflow automatically manages versioning and releases based on commit messages.
 # It uses Conventional Commits to determine the version bump type.
 #
+# REQUIRED SECRET:
+# - PAT_TOKEN: Personal Access Token with 'repo' and 'pull_requests' scopes
+#   Create at: https://github.com/settings/tokens/new
+#   Add to repo secrets at: https://github.com/hope0hermes/StravaFetcher/settings/secrets/actions
+#
 # When it runs:
 # - Automatically: When a PR is merged to main (via "push: branches: [main]")
 # - Manually: Via GitHub Actions UI (workflow_dispatch button)
@@ -12,9 +17,8 @@
 # 2. Determines version bump type (major/minor/patch/none)
 # 3. Updates version in src/strava_fetcher/__init__.py using hatch
 # 4. Updates CHANGELOG.md with new version and commit list
-# 5. Commits version bump back to main with [skip ci] to avoid recursion
-# 6. Creates git tag (e.g., v1.1.0)
-# 7. Creates GitHub Release with tag
+# 5. Creates a PR with version bump changes
+# 6. After PR is merged, create-release.yml automatically creates the GitHub Release
 #
 # Conventional Commit Format → Version Bump:
 # - "feat:" or "feature:" → MINOR bump (1.0.0 → 1.1.0) - New features
@@ -26,12 +30,6 @@
 # - Version stored in: src/strava_fetcher/__init__.py (__version__ = "1.0.0")
 # - Hatch reads/writes version automatically (configured in pyproject.toml)
 # - Single source of truth prevents version conflicts
-#
-# Important Notes:
-# - Use [skip ci] in commit message to prevent infinite workflow loops
-# - Requires "contents: write" permission to push commits and create releases
-# - fetch-depth: 0 ensures we have full git history to find previous tags
-# - If no previous tag exists, analyzes all commits in repository
 
 name: Release
 
@@ -51,7 +49,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Fetch all history so we can find previous tags
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.PAT_TOKEN }}
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -178,4 +176,4 @@ jobs:
           --base main \
           --head "$BRANCH_NAME"
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
