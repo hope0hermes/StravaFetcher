@@ -7,7 +7,7 @@ A robust and flexible solution for synchronizing your Strava activity data and s
 
 ## Why StravaFetcher?
 
-StravaFetcher takes the complexity out of syncing your Strava data locally. Whether you're building custom analytics, training dashboards, or backing up your activities, StravaFetcher provides:
+StravaFetcher simplifies syncing your Strava data locally. Whether you're building custom analytics, training dashboards, or backing up your activities, StravaFetcher provides:
 
 - **Effortless OAuth2 Management**: Complete authentication flow with automatic token refresh
 - **Intelligent Caching**: Incremental updates that only fetch new data
