@@ -67,7 +67,23 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+    - name: Check if should skip
+      id: should_skip
+      run: |
+        COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+        echo "Last commit: $COMMIT_MSG"
+
+        # Skip if commit contains [skip ci] or is a version bump commit
+        if echo "$COMMIT_MSG" | grep -qE "\[skip ci\]|^chore: bump version"; then
+          echo "should_skip=true" >> $GITHUB_OUTPUT
+          echo "Skipping release workflow (version bump or [skip ci] commit)"
+        else
+          echo "should_skip=false" >> $GITHUB_OUTPUT
+          echo "Proceeding with release workflow"
+        fi
+
     - name: Determine version bump type
+      if: steps.should_skip.outputs.should_skip != 'true'
       id: bump_type
       run: |
         # Get all commit messages since last tag (or all commits if no tags)
@@ -98,7 +114,7 @@ jobs:
         echo "Determined bump type: $BUMP"
 
     - name: Bump version
-      if: steps.bump_type.outputs.bump_type != 'none'
+      if: steps.should_skip.outputs.should_skip != 'true' && steps.bump_type.outputs.bump_type != 'none'
       id: version
       run: |
         # Get current version
@@ -114,7 +130,7 @@ jobs:
         echo "Bumped version from $OLD_VERSION to $NEW_VERSION"
 
     - name: Update CHANGELOG
-      if: steps.bump_type.outputs.bump_type != 'none'
+      if: steps.should_skip.outputs.should_skip != 'true' && steps.bump_type.outputs.bump_type != 'none'
       run: |
         NEW_VERSION="${{ steps.version.outputs.new_version }}"
         DATE=$(date +%Y-%m-%d)
@@ -144,7 +160,7 @@ jobs:
         echo "Updated CHANGELOG.md"
 
     - name: Create version bump PR
-      if: steps.bump_type.outputs.bump_type != 'none'
+      if: steps.should_skip.outputs.should_skip != 'true' && steps.bump_type.outputs.bump_type != 'none'
       run: |
         BRANCH_NAME="release/v${{ steps.version.outputs.new_version }}"
 
