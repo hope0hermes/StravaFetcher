@@ -1,6 +1,20 @@
+# Ignore development environment files
+**dev/
+**venv/
+**.venv/
+**temp/
+**.env
+
+# Ignore Python cache files
+**__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore pytest cache and coverage reports
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Ignore data directories
 Data/
-venv/
-.venv/
-*__pycache__/
-temp/
-**cache**/

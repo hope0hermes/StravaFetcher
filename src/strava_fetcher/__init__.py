@@ -1,8 +1,6 @@
-"""
-A robust pipeline for syncing Strava activity data and streams locally.
-"""
+"""A robust pipeline for syncing Strava activity data and streams locally."""
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 
 from .cli import main
 from .exceptions import (

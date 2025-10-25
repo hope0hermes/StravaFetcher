@@ -1,0 +1,95 @@
+# Example Configuration for StravaFetcher
+#
+# This file shows all available configuration options with their default values.
+# Copy this file to your project root and customize as needed.
+#
+# Usage:
+#   strava-fetcher sync --config-file config.yaml
+
+# ============================================================================
+# Strava API Configuration
+# ============================================================================
+# Your Strava API credentials from https://www.strava.com/settings/api
+# IMPORTANT: Never commit real credentials to version control!
+# Consider using environment variables instead:
+#   export STRAVA_CLIENT_ID="your_id"
+#   export STRAVA_CLIENT_SECRET="your_secret"
+
+strava_api:
+  # Your Strava application's client ID
+  # Can also be set via: STRAVA_CLIENT_ID environment variable
+  client_id: "your_client_id_here"
+
+  # Your Strava application's client secret
+  # Can also be set via: STRAVA_CLIENT_SECRET environment variable
+  client_secret: "your_client_secret_here"
+
+# ============================================================================
+# File System Paths
+# ============================================================================
+# Customize where your Strava data is stored locally
+# All paths support ~ for home directory expansion
+
+paths:
+  # Main data directory (parent for all other files)
+  # Default: ~/.strava_fetcher/data
+  data_dir: "~/.strava_fetcher/data"
+
+  # OAuth token storage (automatically managed)
+  # Default: {data_dir}/token.json
+  token_file: "~/.strava_fetcher/data/token.json"
+
+  # Activities cache (CSV file with activity metadata)
+  # Default: {data_dir}/activities.csv
+  activities_cache_file: "~/.strava_fetcher/data/activities.csv"
+
+  # Directory for stream data (time-series data for each activity)
+  # Default: {data_dir}/Streams
+  streams_dir: "~/.strava_fetcher/data/Streams"
+
+# ============================================================================
+# Synchronization Settings
+# ============================================================================
+# Configure how StravaFetcher syncs your data
+
+sync:
+  # Maximum number of activity pages to fetch
+  # Each page contains up to 200 activities
+  # Set lower to limit initial sync, higher for complete history
+  # Default: 100 (up to 20,000 activities)
+  max_pages: 100
+
+  # Seconds to wait when hitting Strava's rate limit
+  # Strava limits: 100 requests per 15 minutes, 1000 per day
+  # Default: 900 (15 minutes)
+  retry_interval_seconds: 900
+
+  # Skip virtual/trainer activities (those marked as trainer rides)
+  # Useful if you only want outdoor activities
+  # Default: false
+  skip_trainer_activities: false
+
+# ============================================================================
+# Example Alternative Configurations
+# ============================================================================
+
+# --- Minimal Configuration (for quick testing) ---
+# paths:
+#   data_dir: "./data"
+# sync:
+#   max_pages: 5
+
+# --- Complete History Sync ---
+# sync:
+#   max_pages: 1000
+#   retry_interval_seconds: 1000
+
+# --- Outdoor Activities Only ---
+# sync:
+#   skip_trainer_activities: true
+
+# --- Custom Data Location ---
+# paths:
+#   data_dir: "/mnt/external/strava_data"
+#   activities_cache_file: "/mnt/external/strava_data/cache/activities.csv"
+#   streams_dir: "/mnt/external/strava_data/streams"

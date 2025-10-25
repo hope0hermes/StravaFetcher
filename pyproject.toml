@@ -4,10 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "strava-fetcher" # The name of your package on PyPI
-version = "1.0.0"
+dynamic = ["version"]
 description = "A robust pipeline for syncing Strava activity data and streams locally."
 readme = "README.md"
-requires-python = ">=3.8" # Minimum Python version
+requires-python = ">=3.12" # Minimum Python version
 license = { file = "LICENSE" } # Assuming you'll add a LICENSE.txt file
 keywords = ["strava", "api", "data sync", "activities", "streams", "pipeline"]
 authors = [
@@ -18,8 +18,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License", # Assuming MIT, change if different
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -46,13 +44,18 @@ strava-fetcher = "strava_fetcher.cli:main"
 [project.optional-dependencies]
 # Define groups of optional dependencies (e.g., for development, testing)
 dev = [
-    "pytest>=7.0.0", # For running tests
-    "mypy>=1.0.0", # For static type checking
-    "ruff>=0.1.0", # All-in-one linter and formatter
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "mypy>=1.14.1",
+    "ruff>=0.9.1",
+    "pylint>=3.3.4"
 ]
 
 [tool.hatch.metadata]
 # Configuration for how Hatch handles project metadata.
+
+[tool.hatch.version]
+path = "src/strava_fetcher/__init__.py"
 
 [tool.hatch.build]
 # Configuration for how Hatch builds your package
@@ -71,22 +74,28 @@ dependencies = [
 # Environment for running tests
 dependencies = [
     "pytest",
-    "ruff", # It's good practice to include the linter here too
+    "pytest-cov",
+    "ruff",
 ]
 [tool.hatch.envs.test.scripts]
 default = ["pytest {args}"]
+cov = ["pytest --cov=src/strava_fetcher --cov-report=term-missing --cov-report=xml --cov-report=html {args}"]
 
 [tool.hatch.envs.lint]
 # Environment for linting and type checking
 dependencies = [
     "ruff",
     "mypy",
+    "pylint",
+    "pydocstyle",
 ]
 [tool.hatch.envs.lint.scripts]
 default = [
     "ruff check . {args}",
     "ruff format --check . {args}",
     "python -m mypy src/strava_fetcher {args}",
+    "pylint src/strava_fetcher {args}",
+    "pydocstyle src/strava_fetcher {args}",
 ]
 check = "ruff check . {args}"
 format-check = "ruff format --check . {args}"
@@ -128,9 +137,27 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+docstring-code-format = true
 
+# Configuration for Pylint
+[tool.pylint]
+[tool.pylint.messages_control]
+disable = [
+    "W1203",  # logging-fstring-interpolation
+    "W2301",  # unnecessary-ellipsis
+    "R0903",  # Too few public methods
+    "R0914",  # Too many local variables
+    "R0915",  # Too many statements
+    "R0902",  # Too many instance attributes
+    "R0911",  # Too many return statements
+    "W0718",  # Broad exception caught
+    "W0613",  # Unused argument
+    "C0415",  # Import outside toplevel
+]
+
+# Configuration for MyPy
 [tool.mypy]
-# Ignore missing imports for pandas
+
 [[tool.mypy.overrides]]
 module = ["pandas.*"]
 ignore_missing_imports = true
@@ -142,3 +169,58 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = ["yaml.*"]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--showlocals",
+    "--tb=short",
+    "--cov=src/strava_fetcher",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "unit: Unit tests (fast, isolated)",
+    "integration: Integration tests (medium speed, database/filesystem)",
+    "e2e: End-to-end tests (slow, full system)",
+    "slow: Tests that take a long time to run",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["src/strava_fetcher"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+[tool.pydocstyle]
+ignore = [
+    "D107",  # Missing docstring in __init__
+    "D203",  # 1 blank line required before class docstring
+    "D212",  # Multi-line docstring summary should start at the first line
+    "D406",  # Section name should end with a newline
+    "D407",  # Missing dashed underline after section
+]

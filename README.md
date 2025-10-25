@@ -1,9 +1,19 @@
-# Strava Data Sync & Analysis Package
+# StravaFetcher 🏃‍♂️💾
 
-This package provides a robust and flexible solution for synchronizing your Strava
-activity data and streams to local storage. Designed for developers and data enthusiasts,
-it handles the complexities of Strava's OAuth2 authentication, API rate limits,
-and data persistence, allowing you to focus on analyzing your athletic performance.
+A robust and flexible solution for synchronizing your Strava activity data and streams to local storage. Designed for developers and data enthusiasts, it handles the complexities of Strava's OAuth2 authentication, API rate limits, and data persistence, allowing you to focus on analyzing your athletic performance.
+
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Why StravaFetcher?
+
+StravaFetcher takes the complexity out of syncing your Strava data locally. Whether you're building custom analytics, training dashboards, or backing up your activities, StravaFetcher provides:
+
+- **Effortless OAuth2 Management**: Complete authentication flow with automatic token refresh
+- **Intelligent Caching**: Incremental updates that only fetch new data
+- **Robust Rate Limiting**: Automatic handling of Strava's API limits with smart retries
+- **Flexible Configuration**: Environment variables, YAML files, or CLI arguments
+- **Clean Data Storage**: Organized CSV files ready for analysis with pandas or other tools
 
 ---
 
@@ -52,13 +62,19 @@ synchronization pipeline.
 2.  **Create a virtual environment (recommended):**
     ```bash
     python -m venv venv
-    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
     ```
 
-3.  **Install dependencies:**
-    Install the package in editable mode with development dependencies:
+3.  **Install the package:**
+
+    Install in editable mode with development dependencies:
     ```bash
-    python -m pip install -e .[dev]
+    pip install -e ".[dev]"
+    ```
+
+    Or for basic usage only:
+    ```bash
+    pip install -e .
     ```
 
 ---
@@ -193,3 +209,198 @@ if __name__ == "__main__":
     # custom_pipeline.sync_all_data()
 
     logging.info("Strava Data Sync Pipeline completed.")
+```
+
+---
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+| Document | Description |
+|----------|-------------|
+| [`VERSION_MANAGEMENT.md`](docs/VERSION_MANAGEMENT.md) | Automated versioning with Conventional Commits |
+| [`ARCHITECTURE_GUIDE.md`](docs/ARCHITECTURE_GUIDE.md) | System architecture and component details |
+| [`TESTING_STRATEGY.md`](docs/TESTING_STRATEGY.md) | Testing approach and best practices |
+
+See also [`examples/`](examples/) for sample configurations and usage patterns.
+
+---
+
+## 🧪 Testing
+
+StravaFetcher uses pytest for testing with comprehensive coverage.
+
+### Run All Tests
+
+```bash
+# Using hatch (recommended)
+hatch run test:default
+
+# Run with coverage
+hatch run test:cov
+
+# Using pytest directly
+pytest
+```
+
+### Run Specific Tests
+
+```bash
+# Run single test file
+pytest tests/unit/test_settings.py
+
+# Run specific test
+pytest tests/unit/test_settings.py::test_load_from_env_vars
+
+# Run with verbose output
+pytest -v
+```
+
+### Test Coverage
+
+Check current test coverage:
+```bash
+hatch run test:cov
+```
+
+View HTML coverage report:
+```bash
+pytest --cov=src/strava_fetcher --cov-report=html
+open htmlcov/index.html
+```
+
+See [`docs/TESTING_STRATEGY.md`](docs/TESTING_STRATEGY.md) for more details.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how to get started:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes**
+4. **Run tests**: `pytest`
+5. **Run linting**: `ruff check .`
+6. **Commit your changes**: `git commit -m 'feat: add amazing feature'`
+7. **Push to the branch**: `git push origin feature/amazing-feature`
+8. **Open a Pull Request**
+
+### Commit Message Format
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) for automated versioning:
+
+```bash
+# New feature (minor version bump)
+git commit -m "feat: add batch stream fetching"
+
+# Bug fix (patch version bump)
+git commit -m "fix: correct rate limit handling"
+
+# Breaking change (major version bump)
+git commit -m "feat!: redesign Settings API"
+
+# Other changes (no version bump)
+git commit -m "docs: update README"
+git commit -m "chore: update dependencies"
+```
+
+See [`docs/VERSION_MANAGEMENT.md`](docs/VERSION_MANAGEMENT.md) for details.
+
+### Code Quality
+
+This project uses:
+- **Ruff** for linting and formatting
+- **MyPy** for type checking
+- **Pylint** for code quality analysis
+- **Pytest** for testing
+
+Run quality checks:
+```bash
+# Format code
+ruff format .
+
+# Check for issues
+ruff check .
+
+# Type checking
+mypy src/strava_fetcher
+
+# Lint with pylint
+pylint src/strava_fetcher
+
+# Run all checks (as in CI)
+hatch run lint:default
+```
+
+---
+
+## 🔄 Version Management
+
+This project uses automated semantic versioning based on commit messages. When a PR is merged to `main`:
+
+1. Commit messages are analyzed
+2. Version is bumped automatically (major/minor/patch)
+3. `CHANGELOG.md` is updated
+4. Git tag is created
+5. GitHub Release is published
+
+**Current Version:** Check with `hatch version` or see [`CHANGELOG.md`](CHANGELOG.md)
+
+See [`docs/VERSION_MANAGEMENT.md`](docs/VERSION_MANAGEMENT.md) for complete details.
+
+---
+
+## 🛣️ Roadmap
+
+### Planned Features
+
+- [ ] **Parallel Downloads**: Concurrent stream fetching for faster sync
+- [ ] **Webhook Support**: Real-time updates via Strava webhooks
+- [ ] **Export Formats**: JSON, Parquet, and SQLite support
+- [ ] **Activity Filtering**: Advanced filtering by type, date, or other criteria
+- [ ] **Data Validation**: Integrity checks for downloaded data
+- [ ] **Progress Tracking**: Enhanced progress bars and ETA calculations
+
+### Recently Added
+
+- ✅ Automated versioning with Conventional Commits
+- ✅ Comprehensive GitHub Actions CI/CD
+- ✅ Full test infrastructure with pytest
+- ✅ Detailed documentation and examples
+- ✅ Dynamic version management with hatch
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+**Technologies:**
+- [Strava API](https://developers.strava.com/) for providing comprehensive athlete data
+- [Pydantic](https://docs.pydantic.dev/) for robust configuration management
+- [Click](https://click.palletsprojects.com/) for elegant CLI interface
+- [Pandas](https://pandas.pydata.org/) for efficient data handling
+
+**Inspiration:**
+- The need for local, analyzable Strava data
+- Open-source data analysis tools
+- The Python data science ecosystem
+
+---
+
+## 📧 Contact
+
+- **Author**: Israel Barragan
+- **Email**: abraham0vidal@gmail.com
+- **GitHub**: [@hope0hermes](https://github.com/hope0hermes)
+- **Issues**: [GitHub Issues](https://github.com/hope0hermes/StravaFetcher/issues)
+
+---
+
+**Happy Syncing! 🚴‍♂️📊**

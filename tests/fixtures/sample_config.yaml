@@ -1,0 +1,19 @@
+# Sample Configuration for Testing
+
+# Strava API Configuration
+strava_api:
+  client_id: "test_client_id"
+  client_secret: "test_client_secret"
+
+# File System Paths
+paths:
+  data_dir: "./test_data"
+  token_file: "./test_data/token.json"
+  activities_cache_file: "./test_data/activities.csv"
+  streams_dir: "./test_data/Streams"
+
+# Synchronization Settings
+sync:
+  max_pages: 5
+  retry_interval_seconds: 60
+  skip_trainer_activities: false
