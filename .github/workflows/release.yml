@@ -169,7 +169,7 @@ jobs:
 
         # Commit changes
         git add src/strava_fetcher/__init__.py CHANGELOG.md
-        git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
+        git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }}"
 
         # Push branch
         git push origin "$BRANCH_NAME"
@@ -191,7 +191,7 @@ jobs:
           --body "$PR_BODY" \
           --base main \
           --head "$BRANCH_NAME"
-        
+
         # Trigger checks on the PR by creating an empty commit
         # This ensures checks run and appear as required status checks
         git commit --allow-empty -m "chore: trigger CI checks"
