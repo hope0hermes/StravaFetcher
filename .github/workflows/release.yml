@@ -149,29 +149,32 @@ jobs:
       if: steps.bump_type.outputs.bump_type != 'none'
       run: |
         BRANCH_NAME="release/v${{ steps.version.outputs.new_version }}"
-        
+
         # Create and checkout new branch
         git checkout -b "$BRANCH_NAME"
-        
+
         # Commit changes
         git add src/strava_fetcher/__init__.py CHANGELOG.md
         git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
-        
+
         # Push branch
         git push origin "$BRANCH_NAME"
-        
+
+        # Create PR body
+        PR_BODY="Automated version bump to ${{ steps.version.outputs.new_version }}
+
+        This PR was automatically created by the release workflow.
+
+        **Changes:**
+        - Updated version in src/strava_fetcher/__init__.py
+        - Updated CHANGELOG.md with release notes
+
+        **Note:** After merging this PR, the GitHub Release will be automatically created by the create-release workflow."
+
         # Create PR using gh CLI
         gh pr create \
           --title "chore: bump version to ${{ steps.version.outputs.new_version }}" \
-          --body "Automated version bump to ${{ steps.version.outputs.new_version }}
-
-This PR was automatically created by the release workflow.
-
-**Changes:**
-- Updated version in \`src/strava_fetcher/__init__.py\`
-- Updated CHANGELOG.md with release notes
-
-**Note:** After merging this PR, manually create the GitHub Release with tag \`v${{ steps.version.outputs.new_version }}\`." \
+          --body "$PR_BODY" \
           --base main \
           --head "$BRANCH_NAME"
       env:
