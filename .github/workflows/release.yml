@@ -145,23 +145,34 @@ jobs:
 
         echo "Updated CHANGELOG.md"
 
-    - name: Commit and push version bump
+    - name: Create version bump PR
       if: steps.bump_type.outputs.bump_type != 'none'
       run: |
+        BRANCH_NAME="release/v${{ steps.version.outputs.new_version }}"
+        
+        # Create and checkout new branch
+        git checkout -b "$BRANCH_NAME"
+        
+        # Commit changes
         git add src/strava_fetcher/__init__.py CHANGELOG.md
-
-        # [skip ci] prevents this commit from triggering workflows again (avoid infinite loop)
         git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
+        
+        # Push branch
+        git push origin "$BRANCH_NAME"
+        
+        # Create PR using gh CLI
+        gh pr create \
+          --title "chore: bump version to ${{ steps.version.outputs.new_version }}" \
+          --body "Automated version bump to ${{ steps.version.outputs.new_version }}
 
-        git push origin main
+This PR was automatically created by the release workflow.
 
-    - name: Create GitHub Release
-      if: steps.bump_type.outputs.bump_type != 'none'
-      run: |
-        gh release create v${{ steps.version.outputs.new_version }} \
-          --title "Release v${{ steps.version.outputs.new_version }}" \
-          --notes "## What's Changed
+**Changes:**
+- Updated version in \`src/strava_fetcher/__init__.py\`
+- Updated CHANGELOG.md with release notes
 
-        See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details."
+**Note:** After merging this PR, manually create the GitHub Release with tag \`v${{ steps.version.outputs.new_version }}\`." \
+          --base main \
+          --head "$BRANCH_NAME"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
