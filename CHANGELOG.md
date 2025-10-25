@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-10-25
+
+### Changed
+- fix: update Python version badge to 3.12+ (#13) (1f61918)
+- fix: use PAT_TOKEN with fallback in checkout step (#11) (9a86a4b)
+- fix: skip release workflow for version bump commits (#10) (871fc62)
+- fix: use PAT_TOKEN for creating PRs in release workflow (#9) (3cc8183)
+- fix: add automated GitHub Release creation workflow (#8) (dcac032)
+- fix: create version bump PR instead of direct push to main (#7) (3de0211)
+- fix: resolve YAML syntax errors in release workflow (#6) (2a585b8)
+- fix: correct sed command escaping in release workflow YAML (#5) (d080c53)
+- fix: update release workflow regex to handle GitHub PR merge format (#4) (1c0d5eb)
+- feat!: implement professional development infrastructure and GitHub integration (#3) (88ee5af)
+
+
 ### Added
 
 #### GitHub Integration & CI/CD
