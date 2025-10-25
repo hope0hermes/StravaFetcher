@@ -22,6 +22,9 @@
 name: Lint Commit Messages
 
 on:
+  push:
+    branches:
+      - 'release/**'  # Trigger on version bump branches
   pull_request:
     branches: [ main ]
     types: [ opened, synchronize, reopened, edited ]
