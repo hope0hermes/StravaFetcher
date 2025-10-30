@@ -4,6 +4,7 @@ A robust and flexible solution for synchronizing your Strava activity data and s
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-SharedWorkflows-brightgreen)](https://github.com/hope0hermes/SharedWorkflows)
 
 ## Why StravaFetcher?
 
