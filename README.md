@@ -377,6 +377,34 @@ See [`docs/VERSION_MANAGEMENT.md`](docs/VERSION_MANAGEMENT.md) for complete deta
 
 ---
 
+## 🤝 Contributing
+
+Contributions are welcome! This project uses automated workflows for quality assurance.
+
+### Development Workflow
+
+1. **Fork and clone** the repository
+2. **Create a feature branch**: `git checkout -b feat/your-feature-name`
+3. **Make your changes** and ensure tests pass
+4. **Commit using Conventional Commits**:
+   - `feat:` for new features (triggers minor version bump)
+   - `fix:` for bug fixes (triggers patch version bump)
+   - `docs:` for documentation changes (no version bump)
+   - `chore:` for maintenance tasks (no version bump)
+5. **Push and create a Pull Request**
+
+### Automated CI/CD
+
+This project uses [SharedWorkflows](https://github.com/hope0hermes/SharedWorkflows) for:
+- ✅ **Automated Testing**: Linting and tests run on every PR
+- ✅ **Version Management**: Semantic versioning based on commit messages
+- ✅ **Release Automation**: Automatic GitHub releases and changelog updates
+- ✅ **Commit Validation**: Ensures Conventional Commits format
+
+All PRs require passing tests and proper commit message format.
+
+---
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
