@@ -257,6 +257,11 @@ pytest tests/unit/test_settings.py
 # Run specific test
 pytest tests/unit/test_settings.py::test_load_from_env_vars
 
+# Run tests by marker
+pytest -m unit        # Run only unit tests
+pytest -m integration # Run only integration tests
+pytest -m "not slow"  # Skip slow tests
+
 # Run with verbose output
 pytest -v
 ```
