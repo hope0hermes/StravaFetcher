@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- SharedWorkflows CI/CD integration for automated version management
+- CI/CD badge linking to SharedWorkflows repository
+- Standardized workflow patterns across projects
+
+### Changed
+- Migrated to SharedWorkflows reusable workflows (67% code reduction)
+- Simplified workflow files from 440 to 143 lines
+
 ## [1.0.6] - 2025-10-26
 
 ### Changed
