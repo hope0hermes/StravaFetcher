@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-10-30
+
+### Changed
+- feat: add pytest marker examples for selective test execution (#42)
+- feat: highlight robust error handling and logging capabilities (#41)
+- feat: add Contributing section with workflow automation documentation (#40)
+- feat: document SharedWorkflows integration and CI/CD improvements (#39)
+- feat: add SharedWorkflows CI/CD badge to README (#38)
+- feat: integrate SharedWorkflows reusable workflows for CI/CD automation (#37)
+
+
 ### Added
 - SharedWorkflows CI/CD integration for automated version management
 - CI/CD badge linking to SharedWorkflows repository
