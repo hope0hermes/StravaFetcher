@@ -367,10 +367,13 @@ See [`docs/VERSION_MANAGEMENT.md`](docs/VERSION_MANAGEMENT.md) for complete deta
 ### Recently Added
 
 - ✅ Automated versioning with Conventional Commits
-- ✅ Comprehensive GitHub Actions CI/CD
+- ✅ Comprehensive GitHub Actions CI/CD using [SharedWorkflows](https://github.com/hope0hermes/SharedWorkflows)
 - ✅ Full test infrastructure with pytest
 - ✅ Detailed documentation and examples
 - ✅ Dynamic version management with hatch
+
+> **Note**: This project uses [SharedWorkflows](https://github.com/hope0hermes/SharedWorkflows) for standardized CI/CD automation.
+> See [.github/SHAREDWORKFLOWS_MIGRATION.md](.github/SHAREDWORKFLOWS_MIGRATION.md) for migration details.
 
 ---
 
