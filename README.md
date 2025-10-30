@@ -32,6 +32,9 @@ activity, offering metrics like heart rate, power, speed, cadence, and GPS coord
 efficient updates and minimizing API calls.
 * **API Rate Limit Handling:** Automatically pauses and retries requests when Strava's
 API rate limits are encountered, ensuring smooth data acquisition for large datasets.
+* **Robust Error Handling:** Custom exception hierarchy with clear error messages for 
+authentication failures, network issues, and API errors. Comprehensive logging throughout
+the pipeline helps diagnose issues quickly.
 * **Configurable and Extensible:** Built with `Pydantic` for clear data structures and validation,
 allowing easy customization of paths, retry intervals, and logging behavior.
 * **Modular Design:** Clean separation of concerns with dedicated classes for
