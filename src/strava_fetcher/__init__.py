@@ -24,7 +24,7 @@ def get_package_info() -> dict[str, str]:
     return {
         "name": "strava-fetcher",
         "version": __version__,
-        "description": "A robust pipeline for syncing Strava activity data and streams locally",
+        "description": "A robust pipeline for syncing Strava activity data",
     }
 
 __all__ = [
