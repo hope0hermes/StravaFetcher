@@ -2,6 +2,17 @@
 
 __version__ = "1.4.1"
 
+from .cli import main
+from .exceptions import (
+    APIError,
+    ConfigError,
+    RateLimitError,
+    StravaFetcherError,
+    UnauthorizedError,
+)
+from .pipeline import StravaSyncPipeline
+from .settings import Settings
+
 
 def get_version() -> str:
     """Get the current version of strava_fetcher."""
@@ -15,18 +26,6 @@ def get_package_info() -> dict[str, str]:
         "version": __version__,
         "description": "A robust pipeline for syncing Strava activity data and streams locally",
     }
-
-
-from .cli import main
-from .exceptions import (
-    APIError,
-    ConfigError,
-    RateLimitError,
-    StravaFetcherError,
-    UnauthorizedError,
-)
-from .pipeline import StravaSyncPipeline
-from .settings import Settings
 
 __all__ = [
     "get_version",
