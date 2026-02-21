@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-02-21
+
+### Changed
+- feat: prepare to be added as ActivitiesViewer dependency (#55)
+- chore: sync workflows and make publish manual-only (#54)
+
+
 ### Added
 - `on_auth_required` callback parameter on `StravaSyncPipeline` for non-interactive
   (web UI) authorization flows
