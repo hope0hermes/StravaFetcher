@@ -4,7 +4,7 @@ Orchestrates the full Strava data synchronization pipeline.
 This module contains the main `StravaSyncPipeline` class, which brings together
 all the components of the package to perform the following steps:
 1. Ensure a valid Strava access token is available.
-2. Synchronize all activity summaries.
+2. Synchronize all activity summaries (incrementally by default).
 3. Synchronize all missing activity streams.
 """
 
@@ -75,19 +75,64 @@ class StravaSyncPipeline:
         self._auth_attempts = 0  # Reset attempts on successful authorization
         return new_token
 
-    def _sync_activities(self, token: Token) -> None:
-        """Synchronize all activity summaries."""
+    def _get_after_epoch(self, existing_df: pd.DataFrame | None) -> int | None:
+        """Extract the most recent activity epoch from the cache for incremental sync.
+
+        Reads the ``start_date`` column, parses it to datetime, and returns the
+        maximum value as a UNIX epoch.  Returns ``None`` when no usable
+        timestamp is found (triggers a full fetch).
+        """
+        if existing_df is None or existing_df.empty:
+            return None
+        if "start_date" not in existing_df.columns:
+            return None
+
+        try:
+            dates = pd.to_datetime(existing_df["start_date"], utc=True)
+            most_recent = dates.max()
+            if pd.isna(most_recent):
+                return None
+            return int(most_recent.timestamp())
+        except Exception:
+            logging.warning(
+                "Could not parse start_date from cache — falling back to full fetch."
+            )
+            return None
+
+    def _sync_activities(self, token: Token, *, full: bool = False) -> None:
+        """Synchronize activity summaries.
+
+        By default performs an **incremental** sync: reads the most recent
+        ``start_date`` from the local cache and passes the ``after`` epoch
+        parameter to the Strava API so only newer activities are returned.
+
+        Args:
+            token: A valid Strava access token.
+            full: When ``True``, ignore the cache timestamp and re-fetch
+                all activities from scratch (equivalent to the old behaviour).
+        """
         logging.info("Starting activity summary synchronization.")
 
         existing_activities_df = self.activity_persistence.read_cache()
-        all_activities = []
+        all_activities: list[pd.DataFrame] = []
         if existing_activities_df is not None:
             all_activities.append(existing_activities_df)
+
+        after_epoch: int | None = None
+        if not full:
+            after_epoch = self._get_after_epoch(existing_activities_df)
+            if after_epoch is not None:
+                logging.info(
+                    "Incremental sync — fetching activities after epoch %d.",
+                    after_epoch,
+                )
+            else:
+                logging.info("No cache or unparseable dates — performing full fetch.")
 
         for page in range(1, self.settings.sync.max_pages + 1):
             logging.info(f"Fetching activity page {page}...")
             activities = self.client.get_activities(
-                token.access_token, page, per_page=100
+                token.access_token, page, per_page=100, after=after_epoch
             )
             if not activities:
                 logging.info("No more activities found. Stopping.")
@@ -156,13 +201,18 @@ class StravaSyncPipeline:
                     f"Failed to fetch streams for activity {activity_id}: {e}"
                 )
 
-    def run(self) -> None:
-        """Execute the full data synchronization pipeline."""
+    def run(self, *, full: bool = False) -> None:
+        """Execute the full data synchronization pipeline.
+
+        Args:
+            full: When ``True``, force a complete re-fetch of all activities
+                instead of an incremental sync.
+        """
         logging.info("--- Starting Strava Data Synchronization ---")
 
         try:
             token = self._get_valid_token()
-            self._sync_activities(token)
+            self._sync_activities(token, full=full)
 
             while True:
                 try:
@@ -176,3 +226,55 @@ class StravaSyncPipeline:
             raise
 
         logging.info("--- Strava Data Synchronization Completed ---")
+
+    def fetch_single_activity(self, activity_id: int) -> None:
+        """Fetch a single activity by ID (metadata + stream).
+
+        Fetches the activity metadata from the Strava API, appends it to the
+        local activities cache (deduplicating on ``id``), and downloads the
+        activity stream if not already on disk.
+
+        Args:
+            activity_id: Strava activity ID to fetch.
+        """
+        logging.info(f"--- Fetching single activity {activity_id} ---")
+
+        token = self._get_valid_token()
+
+        # 1. Fetch activity metadata
+        logging.info(f"Fetching metadata for activity {activity_id}...")
+        activity_data = self.client.get_activity(token.access_token, activity_id)
+
+        # 2. Merge into existing cache
+        new_row = pd.json_normalize([activity_data])
+        existing_df = self.activity_persistence.read_cache()
+        if existing_df is not None:
+            combined = (
+                pd.concat([existing_df, new_row])
+                .drop_duplicates(subset="id")
+                .reset_index(drop=True)
+            )
+        else:
+            combined = new_row
+
+        self.activity_persistence.write_cache(combined)
+        logging.info(
+            f"Activity cache updated ({len(combined)} total activities)."
+        )
+
+        # 3. Fetch stream (if not already on disk)
+        existing_stream_ids = self.activity_persistence.get_existing_stream_ids()
+        if activity_id in existing_stream_ids:
+            logging.info(f"Stream for activity {activity_id} already exists — skipping.")
+        else:
+            logging.info(f"Fetching stream for activity {activity_id}...")
+            streams_data = self.client.get_activity_streams(
+                token.access_token, activity_id
+            )
+            stream_df = pd.DataFrame(
+                {k: v["data"] for k, v in streams_data.items()}
+            )
+            self.activity_persistence.write_stream(activity_id, stream_df)
+            logging.info(f"Stream saved for activity {activity_id}.")
+
+        logging.info(f"--- Single activity {activity_id} fetch complete ---")
