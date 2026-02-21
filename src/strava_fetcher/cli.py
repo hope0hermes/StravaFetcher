@@ -14,17 +14,14 @@ from .exceptions import StravaFetcherError
 from .pipeline import StravaSyncPipeline
 from .settings import load_settings
 
-# --- Basic Logger Setup ---
-# A more sophisticated logging configuration can be added here later
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-
 
 @click.group()
 def main():
     """Fetch and synchronize data from the Strava API."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
 
 
 @main.command()

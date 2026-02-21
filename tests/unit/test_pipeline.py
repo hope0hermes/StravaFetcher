@@ -3,12 +3,9 @@
 from unittest.mock import MagicMock, call, patch
 
 import pandas as pd
-import pytest
-from pydantic import SecretStr
 
 from strava_fetcher.models import Token
 from strava_fetcher.pipeline import StravaSyncPipeline
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -22,7 +19,9 @@ def _make_token() -> Token:
     )
 
 
-def _make_activities_df(start_dates: list[str], ids: list[int] | None = None) -> pd.DataFrame:
+def _make_activities_df(
+    start_dates: list[str], ids: list[int] | None = None,
+) -> pd.DataFrame:
     """Build a minimal activities DataFrame with ``id`` and ``start_date``."""
     if ids is None:
         ids = list(range(1, len(start_dates) + 1))
@@ -161,7 +160,7 @@ class TestSyncActivitiesIncremental:
         pipeline._sync_activities(_make_token(), full=False)
 
         written_df = pipeline.activity_persistence.write_cache.call_args[0][0]
-        assert list(sorted(written_df["id"].tolist())) == [100, 200, 300]
+        assert sorted(written_df["id"].tolist()) == [100, 200, 300]
 
     def test_no_activities_at_all(self, mock_settings):
         """Empty cache + empty API → nothing written."""
@@ -184,7 +183,9 @@ class TestRunForwardsFullFlag:
     @patch.object(StravaSyncPipeline, "_get_valid_token", return_value=_make_token())
     @patch.object(StravaSyncPipeline, "_sync_streams")
     @patch.object(StravaSyncPipeline, "_sync_activities")
-    def test_run_passes_full_true(self, mock_sync_act, mock_sync_str, mock_token, mock_settings):
+    def test_run_passes_full_true(
+        self, mock_sync_act, mock_sync_str, mock_token, mock_settings,
+    ):
         pipeline = StravaSyncPipeline(mock_settings)
         pipeline.run(full=True)
         mock_sync_act.assert_called_once_with(_make_token(), full=True)
@@ -192,7 +193,9 @@ class TestRunForwardsFullFlag:
     @patch.object(StravaSyncPipeline, "_get_valid_token", return_value=_make_token())
     @patch.object(StravaSyncPipeline, "_sync_streams")
     @patch.object(StravaSyncPipeline, "_sync_activities")
-    def test_run_defaults_to_incremental(self, mock_sync_act, mock_sync_str, mock_token, mock_settings):
+    def test_run_defaults_to_incremental(
+        self, mock_sync_act, mock_sync_str, mock_token, mock_settings,
+    ):
         pipeline = StravaSyncPipeline(mock_settings)
         pipeline.run()
         mock_sync_act.assert_called_once_with(_make_token(), full=False)

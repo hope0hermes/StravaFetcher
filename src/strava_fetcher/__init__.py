@@ -1,8 +1,8 @@
 """A robust pipeline for syncing Strava activity data and streams locally."""
 
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 
-from .cli import main
+from .client import StravaClient
 from .exceptions import (
     APIError,
     ConfigError,
@@ -10,8 +10,16 @@ from .exceptions import (
     StravaFetcherError,
     UnauthorizedError,
 )
+from .models import Token
+from .persistence import ActivityPersistence, TokenPersistence
 from .pipeline import StravaSyncPipeline
-from .settings import Settings
+from .settings import (
+    PathSettings,
+    Settings,
+    StravaAPISettings,
+    SyncSettings,
+    load_settings,
+)
 
 
 def get_version() -> str:
@@ -30,12 +38,24 @@ def get_package_info() -> dict[str, str]:
 __all__ = [
     "get_version",
     "get_package_info",
-    "main",
+    # Exceptions
     "StravaFetcherError",
     "APIError",
     "ConfigError",
     "RateLimitError",
     "UnauthorizedError",
+    # Pipeline
     "StravaSyncPipeline",
+    # Client & Models
+    "StravaClient",
+    "Token",
+    # Persistence
+    "TokenPersistence",
+    "ActivityPersistence",
+    # Settings
     "Settings",
+    "StravaAPISettings",
+    "PathSettings",
+    "SyncSettings",
+    "load_settings",
 ]

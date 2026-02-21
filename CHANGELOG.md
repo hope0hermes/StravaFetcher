@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `on_auth_required` callback parameter on `StravaSyncPipeline` for non-interactive
+  (web UI) authorization flows
+- Exported `StravaClient`, `Token`, `TokenPersistence`, `ActivityPersistence`,
+  `PathSettings`, `SyncSettings`, `StravaAPISettings`, and `load_settings`
+  from the top-level package for clean library usage
+- HTTP request timeouts (`DEFAULT_TIMEOUT = (10, 30)`) on all `StravaClient` calls
+- Maximum rate-limit retry count (`MAX_RATE_LIMIT_RETRIES = 10`) to prevent
+  infinite loops in `StravaSyncPipeline.run()`
+
+### Changed
+- `PathSettings` now uses `Path` instead of `DirectoryPath`/`FilePath` validators,
+  allowing `Settings` to be constructed for directories that don't exist yet
+- Loosened pydantic dependency pins from `~=2.11.7` to `>=2.9,<3` and
+  `pydantic-settings` from `~=2.10.1` to `>=2.6,<3`
+- Moved `logging.basicConfig()` from module level in `cli.py` into the `main()`
+  Click group to prevent logging side-effects on import
+- Removed `main` (Click entry point) from `__init__.py` top-level imports to
+  avoid importing CLI machinery when using the package as a library
+
 ## [1.5.0] - 2025-11-17
 
 ### Changed

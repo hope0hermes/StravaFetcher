@@ -10,6 +10,7 @@ all the components of the package to perform the following steps:
 
 import logging
 import time
+from collections.abc import Callable
 
 import click
 import pandas as pd
@@ -20,11 +21,30 @@ from .models import Token
 from .persistence import ActivityPersistence, TokenPersistence
 from .settings import Settings
 
+# Maximum number of rate-limit retries before giving up.
+MAX_RATE_LIMIT_RETRIES = 10
+
 
 class StravaSyncPipeline:
-    """Orchestrates the synchronization of Strava data."""
+    """Orchestrates the synchronization of Strava data.
 
-    def __init__(self, settings: Settings, max_auth_attempts: int = 3):
+    Args:
+        settings: Application settings.
+        max_auth_attempts: Maximum re-authorization attempts before raising.
+        on_auth_required: Optional callback for handling authorization.
+            Receives the authorization URL and must return the auth code string.
+            When ``None`` (default), uses an interactive ``click.prompt``
+            flow suitable for CLI usage. Provide a callback to integrate with
+            web UIs (e.g. Streamlit) or headless environments.
+    """
+
+    def __init__(
+        self,
+        settings: Settings,
+        max_auth_attempts: int = 3,
+        *,
+        on_auth_required: Callable[[str], str] | None = None,
+    ):
         self.settings = settings
         self.client = StravaClient(settings.strava_api)
         self.token_persistence = TokenPersistence(settings.paths.token_file)
@@ -33,12 +53,15 @@ class StravaSyncPipeline:
         )
         self.max_auth_attempts = max_auth_attempts
         self._auth_attempts = 0
+        self._on_auth_required = on_auth_required
 
     def _get_valid_token(self) -> Token:
         """
         Ensure a valid Strava token is available, refreshing it if necessary.
 
-        If no token exists, it guides the user through the authorization process.
+        If no token exists, it either delegates to the ``on_auth_required``
+        callback (if provided) or guides the user through an interactive
+        CLI prompt.
         """
         token = self.token_persistence.read()
 
@@ -64,10 +87,22 @@ class StravaSyncPipeline:
 
         # --- Full Authorization Flow ---
         auth_url = self.client.get_authorization_url()
-        click.echo("Please authorize this application to access your Strava data:")
-        click.echo(f"1. Open this URL in your browser:\n   {auth_url}")
-        click.echo("2. Authorize the app and copy the 'code' from the redirected URL.")
-        auth_code = click.prompt("3. Paste the authorization code here").strip()
+
+        if self._on_auth_required is not None:
+            # Delegate to caller-provided callback (e.g. Streamlit UI)
+            auth_code = self._on_auth_required(auth_url).strip()
+        else:
+            # Default: interactive CLI prompt
+            click.echo(
+                "Please authorize this application to access your Strava data:"
+            )
+            click.echo(f"1. Open this URL in your browser:\n   {auth_url}")
+            click.echo(
+                "2. Authorize the app and copy the 'code' from the redirected URL."
+            )
+            auth_code = click.prompt(
+                "3. Paste the authorization code here"
+            ).strip()
 
         new_token = self.client.exchange_auth_code_for_token(auth_code)
         self.token_persistence.write(new_token)
@@ -214,11 +249,19 @@ class StravaSyncPipeline:
             token = self._get_valid_token()
             self._sync_activities(token, full=full)
 
-            while True:
+            retries = 0
+            while retries < MAX_RATE_LIMIT_RETRIES:
                 try:
                     self._sync_streams(token)
                     break  # Exit loop if sync completes without rate limit error
                 except RateLimitError:
+                    retries += 1
+                    if retries >= MAX_RATE_LIMIT_RETRIES:
+                        logging.error(
+                            "Exceeded maximum %d rate-limit retries. Aborting.",
+                            MAX_RATE_LIMIT_RETRIES,
+                        )
+                        raise
                     continue  # Loop will restart after waiting
 
         except Exception as e:
@@ -265,7 +308,10 @@ class StravaSyncPipeline:
         # 3. Fetch stream (if not already on disk)
         existing_stream_ids = self.activity_persistence.get_existing_stream_ids()
         if activity_id in existing_stream_ids:
-            logging.info(f"Stream for activity {activity_id} already exists — skipping.")
+            logging.info(
+                "Stream for activity %d already exists — skipping.",
+                activity_id,
+            )
         else:
             logging.info(f"Fetching stream for activity {activity_id}...")
             streams_data = self.client.get_activity_streams(

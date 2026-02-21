@@ -1,6 +1,6 @@
 """Tests for single-activity fetch support (Phase 5)."""
 
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest

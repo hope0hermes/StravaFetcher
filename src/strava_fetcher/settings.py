@@ -16,9 +16,7 @@ import yaml
 from pydantic import (
     BaseModel,
     BeforeValidator,
-    DirectoryPath,
     Field,
-    FilePath,
     SecretStr,
     ValidationError,
 )
@@ -47,17 +45,17 @@ class StravaAPISettings(BaseSettings):
 class PathSettings(BaseModel):
     """Settings related to file system paths for data storage."""
 
-    data_dir: DirectoryPath = Field(
+    data_dir: Path = Field(
         default=Path.home() / ".strava_fetcher" / "data",
         description="Base directory for all data files.",
     )
-    token_file: FilePath | None = Field(
+    token_file: Path | None = Field(
         default=None, description="Path to the Strava token file."
     )
-    activities_cache_file: FilePath | None = Field(
+    activities_cache_file: Path | None = Field(
         default=None, description="Path to the activities summary cache file."
     )
-    streams_dir: DirectoryPath | None = Field(
+    streams_dir: Path | None = Field(
         default=None, description="Directory to store activity stream files."
     )
 
