@@ -313,7 +313,7 @@ def sample_activities_df() -> pd.DataFrame:
 def sample_activities_csv(tmp_path: Path, sample_activities_df: pd.DataFrame) -> Path:
     """Create a temporary activities CSV file."""
     csv_path = tmp_path / "activities.csv"
-    sample_activities_df.to_csv(csv_path, index=False)
+    sample_activities_df.to_csv(csv_path, index=False, sep=";")
     return csv_path
 
 
@@ -345,7 +345,7 @@ def sample_stream_df(sample_stream_data: dict) -> pd.DataFrame:
 def sample_stream_csv(tmp_path: Path, sample_stream_df: pd.DataFrame) -> Path:
     """Create a temporary stream CSV file."""
     csv_path = tmp_path / "stream_12345678.csv"
-    sample_stream_df.to_csv(csv_path, index=False)
+    sample_stream_df.to_csv(csv_path, index=False, sep=";")
     return csv_path
 
 

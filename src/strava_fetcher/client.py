@@ -20,6 +20,10 @@ STRAVA_API_BASE_URL = "https://www.strava.com/api/v3"
 STRAVA_OAUTH_URL = "https://www.strava.com/oauth"
 
 
+# Default timeout for all HTTP requests (connect, read) in seconds.
+DEFAULT_TIMEOUT = (10, 30)
+
+
 class StravaClient:
     """A client for interacting with the Strava API."""
 
@@ -68,6 +72,7 @@ class StravaClient:
                 "code": auth_code,
                 "grant_type": "authorization_code",
             },
+            timeout=DEFAULT_TIMEOUT,
         )
         token_data = self._handle_response(response)
         return Token(**token_data)
@@ -83,18 +88,54 @@ class StravaClient:
                 "grant_type": "refresh_token",
                 "refresh_token": refresh_token.get_secret_value(),
             },
+            timeout=DEFAULT_TIMEOUT,
         )
         token_data = self._handle_response(response)
         return Token(**token_data)
 
     def get_activities(
-        self, access_token: SecretStr, page: int, per_page: int
+        self,
+        access_token: SecretStr,
+        page: int,
+        per_page: int,
+        after: int | None = None,
     ) -> list[dict[str, Any]]:
-        """Fetch a single page of activities."""
+        """Fetch a single page of activities.
+
+        Args:
+            access_token: OAuth access token.
+            page: Page number (1-indexed).
+            per_page: Number of activities per page.
+            after: Only return activities after this epoch timestamp.
+        """
+        params: dict[str, Any] = {"page": page, "per_page": per_page}
+        if after is not None:
+            params["after"] = after
+
         response = self.session.get(
             f"{STRAVA_API_BASE_URL}/athlete/activities",
             headers={"Authorization": f"Bearer {access_token.get_secret_value()}"},
-            params={"page": page, "per_page": per_page},
+            params=params,
+            timeout=DEFAULT_TIMEOUT,
+        )
+        return self._handle_response(response)
+
+    def get_activity(
+        self, access_token: SecretStr, activity_id: int
+    ) -> dict[str, Any]:
+        """Fetch metadata for a single activity by ID.
+
+        Args:
+            access_token: OAuth access token.
+            activity_id: Strava activity ID.
+
+        Returns:
+            Activity metadata dict.
+        """
+        response = self.session.get(
+            f"{STRAVA_API_BASE_URL}/activities/{activity_id}",
+            headers={"Authorization": f"Bearer {access_token.get_secret_value()}"},
+            timeout=DEFAULT_TIMEOUT,
         )
         return self._handle_response(response)
 
@@ -118,5 +159,6 @@ class StravaClient:
             f"{STRAVA_API_BASE_URL}/activities/{activity_id}/streams",
             headers={"Authorization": f"Bearer {access_token.get_secret_value()}"},
             params={"keys": ",".join(stream_keys), "key_by_type": "true"},
+            timeout=DEFAULT_TIMEOUT,
         )
         return self._handle_response(response)

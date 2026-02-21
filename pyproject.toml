@@ -27,8 +27,8 @@ dependencies = [
     "requests>=2.31.0",      # For making HTTP requests to Strava API
     "pandas>=2.0.0",         # For data manipulation (DataFrames)
     "PyYAML>=6.0.1",         # For reading YAML credentials file
-    "pydantic~=2.11.7",      # For settings management
-    "pydantic-settings~=2.10.1",
+    "pydantic>=2.9,<3",      # For settings management
+    "pydantic-settings>=2.6,<3",
     "click>=8.0.0",          # For creating the command-line interface
 ]
 
